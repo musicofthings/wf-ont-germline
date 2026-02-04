@@ -86,7 +86,7 @@ from datetime import datetime
 from pathlib import Path
 
 def count_vcf_variants(vcf_path):
-    """Count variants in a VCF file."""
+    #Count variants in a VCF file
     if not Path(vcf_path).exists():
         return 0
     count = 0
@@ -101,7 +101,7 @@ def count_vcf_variants(vcf_path):
     return count
 
 def parse_coverage_summary(summary_path):
-    """Parse mosdepth summary file."""
+    #Parse mosdepth summary file
     coverage_data = {}
     try:
         with open(summary_path, 'r') as f:
