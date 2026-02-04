@@ -433,14 +433,24 @@ workflow {
     if (params.annotate_variants) {
         logStep("VARIANT ANNOTATION", "START")
         
-        // VEP base annotation
-        VEP_ANNOTATE(
-            ch_variants_for_annotation,
-            ch_reference.collect(),
-            params.vep_cache
-        )
-        ch_annotated = VEP_ANNOTATE.out.vcf
-        ch_versions = ch_versions.mix(VEP_ANNOTATE.out.versions)
+        // Start with unannotated variants
+        ch_annotated = ch_variants_for_annotation
+        
+        // VEP base annotation (only if cache is provided)
+        if (params.vep_cache) {
+            ch_vep_cache = Channel.fromPath(params.vep_cache, checkIfExists: true).collect()
+            VEP_ANNOTATE(
+                ch_variants_for_annotation,
+                ch_reference.collect(),
+                ch_vep_cache
+            )
+            ch_annotated = VEP_ANNOTATE.out.vcf
+            ch_versions = ch_versions.mix(VEP_ANNOTATE.out.versions)
+        } else {
+            log.warn "[WARN] VEP cache not provided (--vep_cache) - skipping VEP annotation"
+        }
+        
+        
         
         // ClinVar annotation
         if (params.clinvar_vcf) {
