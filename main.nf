@@ -450,8 +450,6 @@ workflow {
             log.warn "[WARN] VEP cache not provided (--vep_cache) - skipping VEP annotation"
         }
         
-        
-        
         // ClinVar annotation
         if (params.clinvar_vcf) {
             CLINVAR_ANNOTATE(
@@ -544,9 +542,10 @@ workflow {
         .collectFile(name: 'software_versions.yml', storeDir: "${params.outdir}/pipeline_info")
     
     // MultiQC report
+    ch_multiqc_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect() : Channel.value([])
     MULTIQC(
         ch_multiqc_files.collect().ifEmpty([]),
-        params.multiqc_config
+        ch_multiqc_config
     )
     
     // Generate final HTML report
