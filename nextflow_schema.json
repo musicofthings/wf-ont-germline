@@ -1,0 +1,350 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/epi2me-labs/wf-ont-germline/master/nextflow_schema.json",
+    "title": "wf-ont-germline pipeline parameters",
+    "description": "ONT Long-Read Germline Variant Calling Pipeline",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/Output Options",
+            "type": "object",
+            "fa_icon": "fas fa-terminal",
+            "description": "Define where the pipeline should find input data and save output data.",
+            "required": ["input", "reference"],
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "application/gzip",
+                    "description": "Path to input FASTQ file(s), BAM file, or directory containing FASTQ files.",
+                    "help_text": "Can be a single FASTQ/BAM file, or a directory containing multiple FASTQ files. Supports .fastq, .fastq.gz, .fq, .fq.gz, and .bam formats.",
+                    "fa_icon": "fas fa-file-alt"
+                },
+                "reference": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "description": "Path to reference genome FASTA file.",
+                    "help_text": "Reference genome in FASTA format. Must be indexed (.fai file required).",
+                    "fa_icon": "fas fa-dna"
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The output directory where results will be saved.",
+                    "default": "./results",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "sample_name": {
+                    "type": "string",
+                    "description": "Sample name for output files. If not provided, will be inferred from input filename.",
+                    "fa_icon": "fas fa-tag"
+                }
+            }
+        },
+        "analysis_options": {
+            "title": "Analysis Options",
+            "type": "object",
+            "fa_icon": "fas fa-cogs",
+            "description": "Configure which analyses to run.",
+            "properties": {
+                "variant_caller": {
+                    "type": "string",
+                    "default": "clair3",
+                    "description": "Small variant caller to use.",
+                    "enum": ["clair3", "pepper_deepvariant"],
+                    "help_text": "Clair3 is faster, PEPPER-DeepVariant may have slightly higher accuracy.",
+                    "fa_icon": "fas fa-search"
+                },
+                "call_svs": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Call structural variants using Sniffles2.",
+                    "fa_icon": "fas fa-expand-arrows-alt"
+                },
+                "call_cnvs": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Call copy number variants using Spectre.",
+                    "fa_icon": "fas fa-copy"
+                },
+                "phase_variants": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Phase variants and haplotag reads using WhatsHap.",
+                    "fa_icon": "fas fa-code-branch"
+                },
+                "call_methylation": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Call methylation using modkit.",
+                    "help_text": "Requires BAM with MM/ML tags from basecalling with methylation model.",
+                    "fa_icon": "fas fa-dna"
+                },
+                "annotate_variants": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Annotate variants with VEP and clinical databases.",
+                    "fa_icon": "fas fa-tags"
+                }
+            }
+        },
+        "model_options": {
+            "title": "Model/Chemistry Options",
+            "type": "object",
+            "fa_icon": "fas fa-microchip",
+            "description": "Configure basecalling and variant calling models.",
+            "properties": {
+                "basecall_model": {
+                    "type": "string",
+                    "default": "dna_r10.4.1_e8.2_400bps_sup@v4.3.0",
+                    "description": "Basecalling model used for the input data.",
+                    "help_text": "Must match the model used during basecalling for accurate variant calling.",
+                    "fa_icon": "fas fa-brain"
+                },
+                "clair3_model": {
+                    "type": "string",
+                    "default": "/opt/models/ont_r10_dorado_sup_4khz",
+                    "description": "Path to Clair3 model directory.",
+                    "fa_icon": "fas fa-folder"
+                },
+                "pepper_model": {
+                    "type": "string",
+                    "default": "ont_r10_q20",
+                    "description": "PEPPER-DeepVariant model preset.",
+                    "enum": ["ont_r9_guppy5_sup", "ont_r10_q20", "ont_r10_q20_hac"],
+                    "fa_icon": "fas fa-sliders-h"
+                }
+            }
+        },
+        "variant_calling_options": {
+            "title": "Variant Calling Options",
+            "type": "object",
+            "fa_icon": "fas fa-search-plus",
+            "description": "Fine-tune variant calling parameters.",
+            "properties": {
+                "include_all_ctgs": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Include all contigs in variant calling (not just chr1-22, X, Y).",
+                    "fa_icon": "fas fa-list"
+                },
+                "output_gvcf": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Output gVCF file in addition to VCF.",
+                    "fa_icon": "fas fa-file-export"
+                },
+                "min_sv_length": {
+                    "type": "integer",
+                    "default": 50,
+                    "description": "Minimum structural variant length to report.",
+                    "minimum": 30,
+                    "fa_icon": "fas fa-ruler"
+                },
+                "min_sv_support": {
+                    "type": "string",
+                    "default": "auto",
+                    "description": "Minimum read support for SV calling. Use 'auto' for automatic detection.",
+                    "fa_icon": "fas fa-hand-paper"
+                }
+            }
+        },
+        "phasing_options": {
+            "title": "Phasing Options",
+            "type": "object",
+            "fa_icon": "fas fa-code-branch",
+            "description": "Configure haplotype phasing.",
+            "properties": {
+                "phase_indels": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Include indels in phasing.",
+                    "fa_icon": "fas fa-indent"
+                },
+                "ignore_read_groups": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Ignore read groups during phasing.",
+                    "fa_icon": "fas fa-users-slash"
+                },
+                "use_longphase": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use LongPhase instead of WhatsHap for phasing.",
+                    "fa_icon": "fas fa-exchange-alt"
+                }
+            }
+        },
+        "methylation_options": {
+            "title": "Methylation Options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Configure methylation calling.",
+            "properties": {
+                "methylation_motif": {
+                    "type": "string",
+                    "default": "CG 0",
+                    "description": "Methylation motif to analyze (e.g., 'CG 0' for CpG).",
+                    "fa_icon": "fas fa-font"
+                },
+                "modkit_filter_threshold": {
+                    "type": "number",
+                    "default": 0.75,
+                    "description": "Minimum probability threshold for methylation calls.",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-filter"
+                },
+                "partition_by_haplotype": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Partition methylation calls by haplotype.",
+                    "fa_icon": "fas fa-columns"
+                }
+            }
+        },
+        "annotation_options": {
+            "title": "Annotation Options",
+            "type": "object",
+            "fa_icon": "fas fa-tags",
+            "description": "Configure variant annotation.",
+            "properties": {
+                "genome_assembly": {
+                    "type": "string",
+                    "default": "GRCh38",
+                    "description": "Genome assembly version.",
+                    "enum": ["GRCh37", "GRCh38"],
+                    "fa_icon": "fas fa-globe"
+                },
+                "vep_cache": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to VEP cache directory.",
+                    "fa_icon": "fas fa-database"
+                },
+                "clinvar_vcf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to ClinVar VCF file.",
+                    "fa_icon": "fas fa-hospital"
+                },
+                "gnomad_vcf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to gnomAD VCF file or directory.",
+                    "fa_icon": "fas fa-users"
+                },
+                "dbsnp_vcf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to dbSNP VCF file.",
+                    "fa_icon": "fas fa-fingerprint"
+                },
+                "cadd_snvs": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to CADD SNV scores file.",
+                    "fa_icon": "fas fa-chart-line"
+                },
+                "cadd_indels": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to CADD indel scores file.",
+                    "fa_icon": "fas fa-chart-line"
+                },
+                "rare_af_threshold": {
+                    "type": "number",
+                    "default": 0.01,
+                    "description": "Allele frequency threshold for rare variant filtering.",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-percentage"
+                },
+                "cadd_threshold": {
+                    "type": "integer",
+                    "default": 20,
+                    "description": "CADD PHRED score threshold for damaging variants.",
+                    "minimum": 0,
+                    "fa_icon": "fas fa-thermometer-half"
+                }
+            }
+        },
+        "resource_options": {
+            "title": "Resource Options",
+            "type": "object",
+            "fa_icon": "fas fa-server",
+            "description": "Set computational resource limits.",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "default": 16,
+                    "description": "Maximum number of CPUs to use.",
+                    "minimum": 1,
+                    "fa_icon": "fas fa-microchip"
+                },
+                "max_memory": {
+                    "type": "string",
+                    "default": "64.GB",
+                    "description": "Maximum memory to use.",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "fa_icon": "fas fa-memory"
+                },
+                "max_time": {
+                    "type": "string",
+                    "default": "240.h",
+                    "description": "Maximum time for pipeline execution.",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d)\\s*)+$",
+                    "fa_icon": "fas fa-clock"
+                }
+            }
+        },
+        "generic_options": {
+            "title": "Generic Options",
+            "type": "object",
+            "fa_icon": "fas fa-file-import",
+            "description": "Less common options for the pipeline.",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Display help text.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
+                "version": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-info-circle",
+                    "hidden": true
+                },
+                "monochrome_logs": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Do not use coloured log outputs.",
+                    "fa_icon": "fas fa-palette",
+                    "hidden": true
+                },
+                "validate_params": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Validate parameters on startup.",
+                    "fa_icon": "fas fa-check-circle",
+                    "hidden": true
+                }
+            }
+        }
+    },
+    "allOf": [
+        { "$ref": "#/definitions/input_output_options" },
+        { "$ref": "#/definitions/analysis_options" },
+        { "$ref": "#/definitions/model_options" },
+        { "$ref": "#/definitions/variant_calling_options" },
+        { "$ref": "#/definitions/phasing_options" },
+        { "$ref": "#/definitions/methylation_options" },
+        { "$ref": "#/definitions/annotation_options" },
+        { "$ref": "#/definitions/resource_options" },
+        { "$ref": "#/definitions/generic_options" }
+    ]
+}

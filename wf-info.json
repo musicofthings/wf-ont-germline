@@ -1,0 +1,173 @@
+{
+    "name": "wf-ont-germline",
+    "title": "ONT Germline Variant Calling",
+    "description": "Comprehensive germline variant calling pipeline for Oxford Nanopore long-read whole genome sequencing data",
+    "version": "1.0.0",
+    "author": "Biomni",
+    "license": "MIT",
+    "workflow_type": "analysis",
+    "category": "Human Genomics",
+    "tags": [
+        "germline",
+        "variant calling",
+        "long-read",
+        "nanopore",
+        "WGS",
+        "SNV",
+        "indel",
+        "structural variants",
+        "CNV",
+        "phasing",
+        "methylation",
+        "clinical"
+    ],
+    "min_nextflow_version": "23.04.0",
+    "container_engines": ["docker", "singularity"],
+    "epi2me_compatible": true,
+    "epi2me_version": "5.0.0",
+    "features": {
+        "quality_control": {
+            "enabled": true,
+            "tools": ["NanoPlot", "mosdepth", "FastQC"]
+        },
+        "alignment": {
+            "enabled": true,
+            "tools": ["minimap2", "samtools"]
+        },
+        "small_variant_calling": {
+            "enabled": true,
+            "tools": ["Clair3", "PEPPER-DeepVariant"],
+            "default": "Clair3"
+        },
+        "structural_variant_calling": {
+            "enabled": true,
+            "tools": ["Sniffles2", "CuteSV"]
+        },
+        "cnv_calling": {
+            "enabled": true,
+            "tools": ["Spectre", "QDNAseq", "CNVpytor"]
+        },
+        "phasing": {
+            "enabled": true,
+            "tools": ["WhatsHap", "LongPhase"]
+        },
+        "methylation": {
+            "enabled": true,
+            "tools": ["modkit"]
+        },
+        "annotation": {
+            "enabled": true,
+            "tools": ["VEP", "bcftools", "vcfanno"],
+            "databases": [
+                "ClinVar",
+                "gnomAD",
+                "dbSNP",
+                "CADD",
+                "REVEL",
+                "SpliceAI",
+                "PharmGKB",
+                "COSMIC",
+                "OMIM"
+            ]
+        }
+    },
+    "input_types": {
+        "fastq": {
+            "description": "FASTQ files from ONT sequencing",
+            "extensions": [".fastq", ".fastq.gz", ".fq", ".fq.gz"]
+        },
+        "bam": {
+            "description": "Aligned BAM file",
+            "extensions": [".bam"]
+        },
+        "reference": {
+            "description": "Reference genome FASTA",
+            "extensions": [".fasta", ".fa", ".fna"]
+        }
+    },
+    "output_types": {
+        "vcf": {
+            "description": "Variant calls in VCF format",
+            "extensions": [".vcf.gz"]
+        },
+        "bam": {
+            "description": "Aligned and haplotagged BAM",
+            "extensions": [".bam"]
+        },
+        "bedmethyl": {
+            "description": "Methylation calls in BED format",
+            "extensions": [".bedmethyl.gz"]
+        },
+        "html": {
+            "description": "Analysis reports",
+            "extensions": [".html"]
+        }
+    },
+    "documentation": {
+        "readme": "README.md",
+        "usage": "docs/usage.md",
+        "output": "docs/output.md",
+        "faq": "docs/faq.md"
+    },
+    "resources": {
+        "minimum": {
+            "cpus": 4,
+            "memory": "16 GB",
+            "storage": "100 GB"
+        },
+        "recommended": {
+            "cpus": 16,
+            "memory": "64 GB",
+            "storage": "500 GB"
+        }
+    },
+    "runtime_estimates": {
+        "30x_wgs": {
+            "description": "30x whole genome sequencing",
+            "time": "12-24 hours",
+            "notes": "Depends on compute resources and enabled analyses"
+        }
+    },
+    "citations": [
+        {
+            "tool": "Clair3",
+            "doi": "10.1038/s43588-022-00387-x",
+            "reference": "Zheng et al. (2022) Symphonizing pileup and full-alignment for deep learning-based long-read variant calling. Nature Computational Science."
+        },
+        {
+            "tool": "Sniffles2",
+            "doi": "10.1038/s41587-023-02024-y",
+            "reference": "Smolka et al. (2024) Detection of mosaic and population-level structural variants with Sniffles2. Nature Biotechnology."
+        },
+        {
+            "tool": "WhatsHap",
+            "doi": "10.1101/085050",
+            "reference": "Martin et al. (2016) WhatsHap: fast and accurate read-based phasing. bioRxiv."
+        },
+        {
+            "tool": "modkit",
+            "url": "https://github.com/nanoporetech/modkit",
+            "reference": "Oxford Nanopore Technologies. modkit: A tool for working with modified bases."
+        },
+        {
+            "tool": "VEP",
+            "doi": "10.1186/s13059-016-0974-4",
+            "reference": "McLaren et al. (2016) The Ensembl Variant Effect Predictor. Genome Biology."
+        }
+    ],
+    "changelog": {
+        "1.0.0": {
+            "date": "2024-01-15",
+            "changes": [
+                "Initial release",
+                "Support for Clair3 and PEPPER-DeepVariant variant calling",
+                "Structural variant calling with Sniffles2",
+                "CNV calling with Spectre",
+                "Haplotype phasing with WhatsHap",
+                "Methylation calling with modkit",
+                "Comprehensive annotation with 9 clinical databases",
+                "EPI2ME Desktop compatibility"
+            ]
+        }
+    }
+}
