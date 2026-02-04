@@ -1,8 +1,9 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/epi2me-labs/wf-ont-germline/master/nextflow_schema.json",
+    "$id": "https://raw.githubusercontent.com/musicofthings/wf-ont-germline/main/nextflow_schema.json",
     "title": "wf-ont-germline pipeline parameters",
     "description": "ONT Long-Read Germline Variant Calling Pipeline",
+    "demo_url": "https://ont-exd-int-s3-euwst1-epi2me-labs.s3.amazonaws.com/wf-human-variation/hg002%2bmods.v1/wf-human-variation-demo.tar.gz",
     "type": "object",
     "definitions": {
         "input_output_options": {
