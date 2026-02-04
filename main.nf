@@ -572,9 +572,9 @@ workflow {
 ║                           PIPELINE COMPLETED                                      ║
 ╠═══════════════════════════════════════════════════════════════════════════════════╣
 ║  Status      : ${success ? '✅ SUCCESS' : '❌ FAILED'}                                              ║
-║  Duration    : ${duration}                                                        
-║  Output Dir  : ${params.outdir}                                                   
-║  Work Dir    : ${workflow.workDir}                                                
+║  Duration    : ${duration}
+║  Output Dir  : ${params.outdir}
+║  Work Dir    : ${workflow.workDir}
 ╚═══════════════════════════════════════════════════════════════════════════════════╝
 
     Output Files:
@@ -601,9 +601,9 @@ workflow {
 ╔═══════════════════════════════════════════════════════════════════════════════════╗
 ║                              PIPELINE ERROR                                       ║
 ╠═══════════════════════════════════════════════════════════════════════════════════╣
-║  Error Message: ${workflow.errorMessage}                                          
-║  Exit Status  : ${workflow.exitStatus}                                            
-║  Work Dir     : ${workflow.workDir}                                               
+║  Error Message: ${workflow.errorMessage}
+║  Exit Status  : ${workflow.exitStatus}
+║  Work Dir     : ${workflow.workDir}
 ╚═══════════════════════════════════════════════════════════════════════════════════╝
 
     Please check the log files in the work directory for more details.
